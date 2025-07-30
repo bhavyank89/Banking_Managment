@@ -1,56 +1,74 @@
 #include <iostream>
 #include <vector>
-#include "SavingAccount.cpp"
-#include "CurrentAccount.cpp"
+#include <ctime>
+#include "Account.cpp"
 
 using namespace std;
+
+int globalCustomerId = 1000;
 
 class Customer
 {
 private:
-    string name, id;
-    vector<Account *> accounts;
+    int id;
+    string name;
+    string pin;
+    Account account;
 
 public:
-    Customer(string name, string id)
+    Customer(string n, string p) : name(n), pin(p), account()
     {
-        this->name = name;
-        this->id = id;
+        id = globalCustomerId++;
     }
 
-    string getID() const
+    int getId() const
     {
         return id;
     }
 
-    void createAccount()
+    bool verifyPin(const string &p) const
     {
-        int type;
-        string accNum, pin;
-
-        cout << "Enter new Account Number: ";
-        cin >> accNum;
-        cout << "Set a 4-digit PIN: ";
-        cin >> pin;
-
-        cout << "Select Account Type:\n1. Savings\n2. Current\nChoice: ";
-        cin >> type;
-
-        if (type == 1)
-            accounts.push_back(new SavingAccount(accNum, pin));
-        else
-            accounts.push_back(new CurrentAccount(accNum, pin));
-
-        cout << "Account created successfully.\n";
+        return p == pin;
     }
 
-    Account *getAccountByNumber(string accNum)
+    void menu()
     {
-        for (auto &acc : accounts)
+        int choice;
+        do
         {
-            if (acc->getAccountNumber() == accNum)
-                return acc;
-        }
-        return nullptr;
+            cout << "\nWelcome, " << name << "! Choose an option:\n";
+            cout << "1. Deposit\n2. Withdraw\n3. Check Balance\n4. View History\n5. Exit\nChoice: ";
+            cin >> choice;
+            switch (choice)
+            {
+            case 1:
+            {
+                double amt;
+                cout << "Enter amount to deposit: ";
+                cin >> amt;
+                account.deposit(amt);
+                break;
+            }
+            case 2:
+            {
+                double amt;
+                cout << "Enter amount to withdraw: ";
+                cin >> amt;
+                account.withdraw(amt);
+                break;
+            }
+            case 3:
+                cout << "Current Balance: Rs. " << account.getBalance() << endl;
+                break;
+            case 4:
+                account.printHistory();
+                break;
+            case 5:
+                cout << "Logging out...\n";
+                break;
+            default:
+                cout << "Invalid choice.\n";
+            }
+        } while (choice != 5);
     }
 };

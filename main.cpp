@@ -1,48 +1,83 @@
 #include <iostream>
-#include "Bank.cpp"
+#include <vector>
+#include "Customer.cpp"
 
 using namespace std;
+
+vector<Customer> customers;
+
+void welcome();
+void registerCustomer();
+void login();
+
+int main()
+{
+    int choice;
+    welcome();
+    do
+    {
+        cout << "\n1. Register\n2. Login\n3. Exit\nChoose: ";
+        cin >> choice;
+        switch (choice)
+        {
+        case 1:
+            registerCustomer();
+            break;
+        case 2:
+            login();
+            break;
+        case 3:
+            cout << "Thank you for using the Banking System.\n";
+            break;
+        default:
+            cout << "Invalid choice.\n";
+        }
+    } while (choice != 3);
+    return 0;
+}
 
 void welcome()
 {
     cout << "==============================\n";
-    cout << "     BANKING MANAGEMENT SYSTEM\n";
+    cout << "  Welcome to MyBank System\n";
     cout << "==============================\n";
 }
 
-int main()
+void registerCustomer()
 {
-    Bank bank;
-    welcome();
+    string name, pin;
+    cout << "Enter your name: ";
+    cin >> ws;
+    getline(cin, name);
+    cout << "Set a 4-digit PIN: ";
+    cin >> pin;
 
-    int choice;
-    do
+    Customer newCustomer(name, pin);
+    customers.push_back(newCustomer);
+    cout << "Account created successfully! Your ID is: " << newCustomer.getId() << endl;
+}
+
+void login()
+{
+    int id;
+    string pin;
+    cout << "Enter Customer ID: ";
+    cin >> id;
+    cout << "Enter PIN: ";
+    cin >> pin;
+
+    bool found = false;
+    for (auto &c : customers)
     {
-        cout << "\n1. Create Customer\n";
-        cout << "2. Create Account\n";
-        cout << "3. Login to Account\n";
-        cout << "4. Exit\n";
-        cout << "Enter your choice: ";
-        cin >> choice;
-
-        switch (choice)
+        if (c.getId() == id && c.verifyPin(pin))
         {
-        case 1:
-            bank.createCustomer();
+            found = true;
+            c.menu();
             break;
-        case 2:
-            bank.createAccount();
-            break;
-        case 3:
-            bank.login();
-            break;
-        case 4:
-            cout << "Thank you for using the system.\n";
-            break;
-        default:
-            cout << "Invalid choice. Try again.\n";
         }
-    } while (choice != 4);
-
-    return 0;
+    }
+    if (!found)
+    {
+        cout << "Invalid ID or PIN.\n";
+    }
 }

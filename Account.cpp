@@ -1,54 +1,67 @@
 #include <iostream>
+#include <vector>
+#include <ctime>
+#include <iomanip>
+#include "Transaction.cpp"
+
 using namespace std;
 
 class Account
 {
-protected:
-    string accountNumber;
-    string pin;
+private:
     double balance;
+    vector<Transaction> history;
 
 public:
-    Account(string accNum, string pin)
-    {
-        this->accountNumber = accNum;
-        this->pin = pin;
-        this->balance = 0.0;
-    }
+    Account() : balance(0.0) {}
 
-    virtual void deposit(double amt)
+    void deposit(double amount)
     {
-        balance += amt;
-        cout << "Deposited ₹" << amt << ". New Balance: ₹" << balance << endl;
-    }
-
-    virtual void withdraw(double amt)
-    {
-        if (balance >= amt)
+        if (amount <= 0)
         {
-            balance -= amt;
-            cout << "Withdrawn ₹" << amt << ". Remaining Balance: ₹" << balance << endl;
+            cout << "Invalid deposit amount.\n";
+            return;
         }
-        else
+        balance += amount;
+        history.push_back(Transaction("Deposit", amount));
+        cout << "Deposited Rs. " << fixed << setprecision(2) << amount << " successfully.\n";
+    }
+
+    void withdraw(double amount)
+    {
+        if (amount <= 0)
         {
-            cout << "Insufficient balance.\n";
+            cout << "Invalid withdrawal amount.\n";
+            return;
+        }
+        if (amount > balance)
+        {
+            cout << "Insufficient funds.\n";
+            return;
+        }
+        balance -= amount;
+        history.push_back(Transaction("Withdraw", amount));
+        cout << "Withdrew Rs. " << fixed << setprecision(2) << amount << " successfully.\n";
+    }
+
+    double getBalance() const
+    {
+        return balance;
+    }
+
+    void printHistory() const
+    {
+        if (history.empty())
+        {
+            cout << "No transactions found.\n";
+            return;
+        }
+
+        cout << "Transaction History:\n";
+        cout << left << setw(12) << "Type" << setw(10) << "Amount" << "Time\n";
+        for (const auto &t : history)
+        {
+            cout << setw(12) << t.type << setw(10) << t.amount << t.timestamp << "\n";
         }
     }
-
-    string getAccountNumber()
-    {
-        return accountNumber;
-    }
-
-    bool validatePIN(string inputPIN)
-    {
-        return pin == inputPIN;
-    }
-
-    virtual void display()
-    {
-        cout << "Account No: " << accountNumber << "\nBalance: ₹" << balance << endl;
-    }
-
-    virtual ~Account() {}
 };
